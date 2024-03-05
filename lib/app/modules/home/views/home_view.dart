@@ -20,6 +20,12 @@ class HomeView extends GetWidget<HomeController> {
       appBar: AppBar(
         title: const Text('HomeView'),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () async {
+            getIt<FirebaseService>().logOut();
+          },
+        ),
       ),
       body: StreamBuilder(
         stream: getIt<FirebaseService>().getUserList(),

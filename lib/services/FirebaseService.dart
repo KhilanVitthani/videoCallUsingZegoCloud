@@ -109,4 +109,11 @@ class FirebaseService {
         .where('id', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
   }
+
+  void logOut() async {
+    ZegoUIKitPrebuiltCallInvitationService().uninit();
+    await FirebaseAuth.instance.signOut();
+    box.erase();
+    Get.offAllNamed(Routes.SING_IN);
+  }
 }
