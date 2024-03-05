@@ -1,0 +1,33 @@
+name: video_call
+version: 1.0.0+1
+publish_to: none
+description: A new Flutter project.
+environment: 
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies: 
+  cupertino_icons: ^1.0.2
+  get: 4.6.6
+  firebase_core: ^2.25.5
+  cloud_firestore: ^4.15.6
+  firebase_auth: ^4.17.6
+  get_it:
+  get_storage:
+
+  flutter:
+    sdk: flutter
+  zego_uikit_prebuilt_call: ^4.4.1
+  zego_uikit_signaling_plugin: ^2.7.6
+
+dev_dependencies: 
+  flutter_lints: ^2.0.0
+  flutter_test: 
+    sdk: flutter
+
+
+dependency_overrides:
+  flutter_screenutil: ^5.9.0
+
+flutter: 
+  uses-material-design: true
+

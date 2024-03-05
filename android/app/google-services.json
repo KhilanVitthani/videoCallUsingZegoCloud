@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1029656996388",
+    "project_id": "vedeocalldemo",
+    "storage_bucket": "vedeocalldemo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029656996388:android:6a8ea109e4ae44e47b86b1",
+        "android_client_info": {
+          "package_name": "com.example.video_call"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsAobNX6osxFiBzFifcd0egJ2uhpR9Iy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
