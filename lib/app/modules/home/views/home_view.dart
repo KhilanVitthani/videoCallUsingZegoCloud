@@ -76,6 +76,8 @@ class HomeView extends GetWidget<HomeController> {
         invitees: [
           ZegoUIKitUser(id: userModel.id!, name: userModel.name!),
         ],
+        iconSize: Size(50, 50),
+        buttonSize: Size(60, 60),
         callID: "${DateTime.now().millisecondsSinceEpoch}",
       );
 }
