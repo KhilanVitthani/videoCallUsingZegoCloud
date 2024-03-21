@@ -6,6 +6,8 @@ abstract class Routes {
   static const HOME = _Paths.HOME;
   static const SING_UP = _Paths.SING_UP;
   static const SING_IN = _Paths.SING_IN;
+  static const SPLASH = _Paths.SPLASH;
+  static const PEER_CHAT_PAGE = _Paths.PEER_CHAT_PAGE;
 }
 
 abstract class _Paths {
@@ -13,4 +15,6 @@ abstract class _Paths {
   static const HOME = '/home';
   static const SING_UP = '/sing-up';
   static const SING_IN = '/sing-in';
+  static const SPLASH = '/splash';
+  static const PEER_CHAT_PAGE = '/peer-chat-page';
 }

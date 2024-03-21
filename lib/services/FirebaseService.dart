@@ -4,10 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:video_call/app/routes/app_pages.dart';
 import 'package:video_call/constants/sizeConstant.dart';
-import 'package:video_call/constants/stringConstant.dart';
 import 'package:video_call/model/userModel.dart';
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
-import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 
 import '../constants/api_constants.dart';
 import '../constants/progress_dialog_utils.dart';
@@ -32,13 +29,6 @@ class FirebaseService {
         getIt<CustomDialogs>().hideCircularDialog(context);
         box.write(PrefStrings.userData, userModel.toJson());
         box.write(PrefStrings.isUserLogin, true);
-        ZegoUIKitPrebuiltCallInvitationService().init(
-          appID: StringConstant.appId /*input your AppID*/,
-          appSign: StringConstant.appSign /*input your AppSign*/,
-          userID: userModel.id!,
-          userName: userModel.name!,
-          plugins: [ZegoUIKitSignalingPlugin()],
-        );
         Get.offAllNamed(Routes.HOME);
         print("User Added");
       }).catchError((error) {
@@ -73,13 +63,6 @@ class FirebaseService {
               UserModel.fromJson(value.data() as Map<String, dynamic>);
           box.write(PrefStrings.userData, value.data());
           box.write(PrefStrings.isUserLogin, true);
-          ZegoUIKitPrebuiltCallInvitationService().init(
-            appID: StringConstant.appId /*input your AppID*/,
-            appSign: StringConstant.appSign /*input your AppSign*/,
-            userID: currentUser.id!,
-            userName: currentUser.name!,
-            plugins: [ZegoUIKitSignalingPlugin()],
-          );
           Get.offAllNamed(Routes.HOME);
         }
         print("User Added");
@@ -111,7 +94,6 @@ class FirebaseService {
   }
 
   void logOut() async {
-    ZegoUIKitPrebuiltCallInvitationService().uninit();
     await FirebaseAuth.instance.signOut();
     box.erase();
     Get.offAllNamed(Routes.SING_IN);

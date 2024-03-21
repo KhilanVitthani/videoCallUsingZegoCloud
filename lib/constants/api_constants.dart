@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:get/get.dart';
-
 class ApiConstant {
   static const baseUrl =
       "http://ec2-13-233-147-132.ap-south-1.compute.amazonaws.com:8080/api/";
@@ -63,38 +59,8 @@ class ApiConstant {
 }
 
 class ArgumentConstant {
-  static const AppVersion = "AppVersion";
-  static const isFromQuotation = "isFromQuotation";
-  static const photoModel = "photoModel";
-  static const calenderDetails = "calenderDetails";
-  static const kycTitle = "kycTitle";
-  static const kycModel = "kycModel";
-  static const index = "index";
-  static const verifyUserName = "k-a5a8ec04-aaa4-446f-bd30-292061d2d1d1";
-  static const verifyPassword = "s-c0802fdd-9708-4523-83d8-7e9f7d208994";
-  static const session_id = "session_id";
-  static const DRIVING_LICENCE = "DRIVING_LICENCE";
-  static const PAN_CARD = "PAN_CARD";
-  static const PASSPORT = "PASSPORT";
-  static const VOTER_ID = "VOTER_ID";
-  static const AADHAAR_CARD = "AADHAAR_CARD";
-  static const userReview = "userReview";
-  static const paymentModel = "paymentModel";
-  static const url = "url";
-  static String shareAppAndroid = (Platform.isIOS)
-      ? "https://apps.apple.com/in/app/shadibazaar-business/id6478437683"
-      : "https://play.google.com/store/apps/details?id=com.primezyventure.shaidbazaarvendor";
-  static String shareApp =
-      "Found the perfect customers on ShadiBazaar Business 🌟✨ Let others discover your amazing services too! Tap to share and expand your business reach! 💼🚀📲 Download ShadiBazaar Vendor App: $shareAppAndroid";
-  static String shareVendor =
-      "Hey there! 🌟 Just discovered an incredible vendor on ShadiBazaar with top-notch services. You should definitely check them out!👉 Vendor Here:$shareAppAndroid";
-  static const contactUs =
-      "https://d2ii5jq3v8tudi.cloudfront.net/contact-us.html";
-  static const termsAndCondition =
-      "https://www.termsfeed.com/live/4ecf677a-808a-4401-870c-64acaed55840";
-  static const privacyPolicy =
-      "https://www.termsfeed.com/live/9c30511a-5a4e-4518-98ba-30feddd090d7";
-  static const appBarTitle = "appBarTitle";
+  static const conversationID = "conversationID";
+  static const conversationName = "conversationName";
 }
 
 class PrefStrings {
