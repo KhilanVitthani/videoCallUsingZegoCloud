@@ -51,7 +51,10 @@ class SendImageMsgCellState extends State<SendImageMsgCell> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -62,10 +65,6 @@ class SendImageMsgCellState extends State<SendImageMsgCell> {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(widget.message.senderUserID),
-              SizedBox(
-                height: 5,
-              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -96,12 +95,15 @@ class SendImageMsgCellState extends State<SendImageMsgCell> {
                   ),
                   ImageBubble(filelocalPath: widget.message.fileLocalPath)
                 ],
-              )
+              ),
+              Text(
+                  DateTime.fromMillisecondsSinceEpoch(widget.message.timestamp)
+                      .toString(),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                  )),
             ],
-          ),
-          Icon(
-            Icons.person,
-            size: 50,
           ),
         ],
       ),

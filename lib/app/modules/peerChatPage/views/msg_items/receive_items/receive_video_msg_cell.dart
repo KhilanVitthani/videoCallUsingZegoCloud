@@ -60,28 +60,30 @@ class ReceiveVideoeMsgCellState extends State<ReceiveVideoMsgCell> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.person,
-            size: 50,
-          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(widget.message.senderUserID),
-              SizedBox(
-                height: 5,
-              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [getVideoBubble()],
-              )
+              ),
+              Text(
+                  DateTime.fromMillisecondsSinceEpoch(widget.message.timestamp)
+                      .toString(),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                  )),
             ],
           ),
         ],

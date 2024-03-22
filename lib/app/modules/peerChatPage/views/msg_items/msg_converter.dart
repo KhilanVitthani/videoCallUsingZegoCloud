@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/receive_items/receive_image_msg_cell.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/receive_items/receive_text_msg_cell.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/receive_items/receive_video_msg_cell.dart';
+import 'package:video_call/app/modules/peerChatPage/views/msg_items/receive_items/recive_custome_msg_cell.dart';
+import 'package:video_call/app/modules/peerChatPage/views/msg_items/send_items/send_custom_msg.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/send_items/send_image_msg_cell.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/send_items/send_text_msg_cell.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/send_items/send_video_msg_cell.dart';
@@ -59,6 +61,13 @@ class MsgConverter {
             cell = SendTextMsgCell(message: textMessage);
           } else {
             cell = ReceiveTextMsgCell(message: textMessage);
+          }
+          break;
+        case ZIMMessageType.custom:
+          if (message.senderUserID == userID) {
+            cell = SendCustomMsgCell(message: message as ZIMCustomMessage);
+          } else {
+            cell = ReceiveCustomMsgCell(message: (message as ZIMCustomMessage));
           }
           break;
         default:

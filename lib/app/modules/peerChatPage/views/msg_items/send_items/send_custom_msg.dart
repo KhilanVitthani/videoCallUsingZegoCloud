@@ -4,15 +4,15 @@ import 'package:zego_zim/zego_zim.dart';
 
 import '../bubble/text_bubble.dart';
 
-class SendTextMsgCell extends StatefulWidget {
-  ZIMTextMessage message;
+class SendCustomMsgCell extends StatefulWidget {
+  ZIMCustomMessage message;
 
-  SendTextMsgCell({required this.message});
+  SendCustomMsgCell({required this.message});
   @override
   State<StatefulWidget> createState() => _MyCellState();
 }
 
-class _MyCellState extends State<SendTextMsgCell> {
+class _MyCellState extends State<SendCustomMsgCell> {
   get isSending {
     if (widget.message.sentStatus == ZIMMessageSentStatus.sending) {
       return true;
@@ -103,7 +103,9 @@ class _MyCellState extends State<SendTextMsgCell> {
                             )),
                       ),
                       TextBubble(widget.message.message, Colors.green.shade300,
-                          Colors.black, 5, 5)
+                          Colors.black, 5, 5,
+                          isCustom: true,
+                          conversationID: widget.message.messageID.toString()),
                     ],
                   ),
                   Text(

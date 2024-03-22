@@ -8,6 +8,7 @@ abstract class Routes {
   static const SING_IN = _Paths.SING_IN;
   static const SPLASH = _Paths.SPLASH;
   static const PEER_CHAT_PAGE = _Paths.PEER_CHAT_PAGE;
+  static const VIDEO_CONFERENCE = _Paths.VIDEO_CONFERENCE;
 }
 
 abstract class _Paths {
@@ -17,4 +18,5 @@ abstract class _Paths {
   static const SING_IN = '/sing-in';
   static const SPLASH = '/splash';
   static const PEER_CHAT_PAGE = '/peer-chat-page';
+  static const VIDEO_CONFERENCE = '/video-conference';
 }

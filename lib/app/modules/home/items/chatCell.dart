@@ -160,6 +160,13 @@ class ConverListCell extends StatefulWidget {
 
 class _MyState extends State<ConverListCell> {
   @override
+  void didChangeDependencies() {
+    print("object");
+    setState(() {});
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     //最外层容器
     return GestureDetector(

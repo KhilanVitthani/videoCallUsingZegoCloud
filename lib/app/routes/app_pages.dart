@@ -10,6 +10,8 @@ import '../modules/singUp/bindings/sing_up_binding.dart';
 import '../modules/singUp/views/sing_up_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
+import '../modules/videoConference/bindings/video_conference_binding.dart';
+import '../modules/videoConference/views/video_conference_view.dart';
 
 part 'app_routes.dart';
 
@@ -43,6 +45,11 @@ class AppPages {
       name: _Paths.PEER_CHAT_PAGE,
       page: () => const PeerChatPageView(),
       binding: PeerChatPageBinding(),
+    ),
+    GetPage(
+      name: _Paths.VIDEO_CONFERENCE,
+      page: () => const VideoConferenceView(),
+      binding: VideoConferenceBinding(),
     ),
   ];
 }

@@ -3,16 +3,16 @@ import 'package:zego_zim/zego_zim.dart';
 
 import '../bubble/text_bubble.dart';
 
-class ReceiveTextMsgCell extends StatefulWidget {
-  ZIMTextMessage message;
+class ReceiveCustomMsgCell extends StatefulWidget {
+  ZIMCustomMessage message;
 
-  ReceiveTextMsgCell({required this.message});
+  ReceiveCustomMsgCell({required this.message});
 
   @override
   State<StatefulWidget> createState() => _MyCellState();
 }
 
-class _MyCellState extends State<ReceiveTextMsgCell> {
+class _MyCellState extends State<ReceiveCustomMsgCell> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -35,7 +35,9 @@ class _MyCellState extends State<ReceiveTextMsgCell> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   TextBubble(
-                      widget.message.message, Colors.white, Colors.black, 5, 5),
+                      widget.message.message, Colors.white, Colors.black, 5, 5,
+                      isCustom: true,
+                      conversationID: widget.message.messageID.toString()),
                   Text(
                       DateTime.fromMillisecondsSinceEpoch(
                               widget.message.timestamp)

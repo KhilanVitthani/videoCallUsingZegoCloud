@@ -19,7 +19,7 @@ class PeerChatPageView extends GetView<PeerChatPageController> {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              "appBarTitleValue",
+              controller.conversationName,
               style: const TextStyle(color: Colors.black),
             ),
             backgroundColor: Colors.white70,
@@ -35,6 +35,15 @@ class PeerChatPageView extends GetView<PeerChatPageController> {
                 );
               },
             ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  controller.sendCustomMessage();
+                },
+                icon: const Icon(Icons.dashboard_customize),
+                color: Colors.black,
+              ),
+            ],
           ),
           body: Column(
             children: [

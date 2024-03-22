@@ -19,7 +19,7 @@ class HomeController extends GetxController {
   RxInt totalUnreadMsg = 0.obs;
   RxBool isConnecting = false.obs;
   RxBool isDisConnected = false.obs;
-  RxList<ConverListCell> converWidgetList = <ConverListCell>[].obs;
+  RxList<ZIMConversation> conversationList = <ZIMConversation>[].obs;
   RxList<ZIMConversation> _converList = <ZIMConversation>[].obs;
   ScrollController scrollController = ScrollController();
   RxBool hasData = false.obs;
@@ -62,11 +62,11 @@ class HomeController extends GetxController {
           context, onError.code, onError.message!);
     }
     registerZIMEvent();
-    if (converWidgetList.isEmpty) getMoreConverWidgetList();
+    if (conversationList.isEmpty) getMoreconversationList();
     registerConverUpdate();
   }
 
-  getMoreConverWidgetList() async {
+  getMoreconversationList() async {
     ZIMConversationQueryConfig queryConfig = ZIMConversationQueryConfig();
     queryConfig.count = 20;
     try {
@@ -78,12 +78,12 @@ class HomeController extends GetxController {
       ZIMConversationListQueriedResult result =
           await ZIM.getInstance()!.queryConversationList(queryConfig);
       _converList.addAll(result.conversationList);
-      List<ConverListCell> newConverWidgetList = [];
+      List<ZIMConversation> newconversationList = [];
       for (ZIMConversation newConversation in result.conversationList) {
-        ConverListCell newConverListCell = ConverListCell(newConversation);
-        newConverWidgetList.add(newConverListCell);
+        ZIMConversation newConverListCell = newConversation;
+        newconversationList.add(newConverListCell);
       }
-      converWidgetList.addAll(newConverWidgetList);
+      conversationList.addAll(newconversationList);
       update();
     } on PlatformException catch (onError) {
       return null;
@@ -96,9 +96,7 @@ class HomeController extends GetxController {
         switch (changeInfo.event) {
           case ZIMConversationEvent.added:
             _converList.insert(0, changeInfo.conversation!);
-            ConverListCell newConverListCell =
-                ConverListCell(changeInfo.conversation!);
-            converWidgetList.insert(0, newConverListCell);
+            conversationList.insert(0, changeInfo.conversation!);
             update();
             break;
           case ZIMConversationEvent.updated:
@@ -107,19 +105,13 @@ class HomeController extends GetxController {
                 changeInfo.conversation?.conversationID);
             int oldConverIndex = _converList.indexOf(oldConver);
             _converList[oldConverIndex] = changeInfo.conversation!;
-            ConverListCell oldConverListCell = converWidgetList
-                .singleWhere((element) => element.conversation == oldConver);
+            ZIMConversation oldConverListCell =
+                conversationList.singleWhere((element) => element == oldConver);
             int oldConverListCellIndex =
-                converWidgetList.indexOf(oldConverListCell);
-            ConverListCell newConverListCell =
-                ConverListCell(changeInfo.conversation!);
-            converWidgetList[oldConverListCellIndex] = newConverListCell;
-            // converWidgetList.refresh();
+                conversationList.indexOf(oldConverListCell);
+            conversationList[oldConverListCellIndex] = changeInfo.conversation!;
+            conversationList.refresh();
             hasData.value = true;
-            converWidgetList.map((element) {
-              print(element.conversation.unreadMessageCount);
-              return element;
-            });
             update();
             break;
           case ZIMConversationEvent.disabled:
@@ -128,14 +120,16 @@ class HomeController extends GetxController {
                 changeInfo.conversation?.conversationID);
             int oldConverIndex = _converList.indexOf(oldConver);
             _converList.removeAt(oldConverIndex);
-            ConverListCell oldConverListCell = converWidgetList
-                .singleWhere((element) => element.conversation == oldConver);
+            ZIMConversation oldConverListCell =
+                conversationList.singleWhere((element) => element == oldConver);
             int oldConverListCellIndex =
-                converWidgetList.indexOf(oldConverListCell);
-            converWidgetList.removeAt(oldConverListCellIndex);
+                conversationList.indexOf(oldConverListCell);
+            conversationList.removeAt(oldConverListCellIndex);
             break;
           default:
         }
+        print("Update");
+        conversationList.refresh();
         update();
         hasData.value = true;
       }
@@ -187,5 +181,144 @@ class HomeController extends GetxController {
         default:
       }
     };
+  }
+
+  String getTitleValue({required ZIMConversation conversation}) {
+    String targetTitle;
+    if (conversation.conversationName != '') {
+      targetTitle = conversation.conversationName;
+    } else {
+      targetTitle = conversation.conversationID;
+    }
+    return targetTitle;
+  }
+
+  bool isShowBadge({required ZIMConversation conversation}) {
+    if (conversation.unreadMessageCount == 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  String getTime({required ZIMConversation conversation}) {
+    if (conversation.lastMessage == null) {
+      return '';
+    }
+    int timeStamp = (conversation.lastMessage!.timestamp / 1000).round();
+
+    int time = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+
+    int _distance = time - timeStamp;
+    if (_distance <= 60) {
+      //return 'now';
+      return '${CustomStamp_str(Timestamp: timeStamp, Date: 'MM/DD hh:mm', toInt: false)}';
+    } else if (_distance <= 3600) {
+      // return '${(_distance / 60).floor()} mintues ago';
+      return '${CustomStamp_str(Timestamp: timeStamp, Date: 'MM/DD hh:mm', toInt: false)}';
+    } else if (_distance <= 43200) {
+      // return '${(_distance / 60 / 60).floor()} hours ago';
+      return '${CustomStamp_str(Timestamp: timeStamp, Date: 'MM/DD hh:mm', toInt: false)}';
+    } else if (DateTime.fromMillisecondsSinceEpoch(time * 1000).year ==
+        DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000).year) {
+      return '${CustomStamp_str(Timestamp: timeStamp, Date: 'MM/DD hh:mm', toInt: false)}';
+    } else {
+      return '${CustomStamp_str(Timestamp: timeStamp, Date: 'YY/MM/DD hh:mm', toInt: false)}';
+    }
+  }
+
+  // 时间戳转时间
+  String CustomStamp_str({
+    int? Timestamp,
+    String? Date,
+    bool toInt = true,
+  }) {
+    Timestamp ??= (new DateTime.now().millisecondsSinceEpoch / 1000).round();
+    String Time_str =
+        (DateTime.fromMillisecondsSinceEpoch(Timestamp * 1000)).toString();
+
+    dynamic Date_arr = Time_str.split(' ')[0];
+    dynamic Time_arr = Time_str.split(' ')[1];
+
+    String YY = Date_arr.split('-')[0];
+    String MM = Date_arr.split('-')[1];
+    String DD = Date_arr.split('-')[2];
+
+    String hh = Time_arr.split(':')[0];
+    String mm = Time_arr.split(':')[1];
+    String ss = Time_arr.split(':')[2];
+
+    ss = ss.split('.')[0];
+
+    if (toInt) {
+      MM = (int.parse(MM)).toString();
+      DD = (int.parse(DD)).toString();
+      hh = (int.parse(hh)).toString();
+      mm = (int.parse(mm)).toString();
+    }
+
+    if (Date == null) {
+      return Time_str;
+    }
+
+    Date = Date.replaceAll('YY', YY)
+        .replaceAll('MM', MM)
+        .replaceAll('DD', DD)
+        .replaceAll('hh', hh)
+        .replaceAll('mm', mm)
+        .replaceAll('ss', ss);
+
+    return Date;
+  }
+
+  IconData getAvatar({required ZIMConversation conversation}) {
+    IconData targetIcon;
+    switch (conversation.type) {
+      case ZIMConversationType.peer:
+        targetIcon = Icons.person;
+        break;
+      case ZIMConversationType.room:
+        targetIcon = Icons.home_sharp;
+        break;
+      case ZIMConversationType.group:
+        targetIcon = Icons.people;
+        break;
+      default:
+        targetIcon = Icons.person;
+    }
+    return targetIcon;
+  }
+
+  String getLastMessageValue({required ZIMConversation conversation}) {
+    String targetMessage;
+    if (conversation.lastMessage == null) return '';
+    switch (conversation.lastMessage!.type) {
+      case ZIMMessageType.text:
+        targetMessage = (conversation.lastMessage as ZIMTextMessage).message;
+        break;
+      case ZIMMessageType.command:
+        targetMessage = '[cmd]';
+        break;
+      case ZIMMessageType.barrage:
+        targetMessage = (conversation.lastMessage as ZIMBarrageMessage).message;
+        break;
+      case ZIMMessageType.audio:
+        targetMessage = '[audio]';
+        break;
+      case ZIMMessageType.video:
+        targetMessage = '[video]';
+        break;
+      case ZIMMessageType.file:
+        targetMessage = '[file]';
+        break;
+      case ZIMMessageType.image:
+        targetMessage = '[image]';
+        break;
+      default:
+        {
+          targetMessage = '[unknown message type]';
+        }
+    }
+    return targetMessage;
   }
 }

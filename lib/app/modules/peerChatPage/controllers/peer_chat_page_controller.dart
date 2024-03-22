@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:video_call/app/modules/home/controllers/home_controller.dart';
+import 'package:video_call/app/modules/peerChatPage/views/msg_items/send_items/send_custom_msg.dart';
+import 'package:video_call/app/routes/app_pages.dart';
 import 'package:video_call/constants/api_constants.dart';
 import 'package:video_call/constants/sizeConstant.dart';
 import 'package:video_call/main.dart';
@@ -15,6 +17,7 @@ import '../views/msg_items/msg_converter.dart';
 import '../views/msg_items/receive_items/receive_image_msg_cell.dart';
 import '../views/msg_items/receive_items/receive_text_msg_cell.dart';
 import '../views/msg_items/receive_items/receive_video_msg_cell.dart';
+import '../views/msg_items/receive_items/recive_custome_msg_cell.dart';
 import '../views/msg_items/send_items/send_text_msg_cell.dart';
 import '../views/msg_items/uploading_progress_model.dart';
 
@@ -143,6 +146,11 @@ class PeerChatPageController extends GetxController {
               update();
             }
             break;
+          case ZIMMessageType.custom:
+            ReceiveCustomMsgCell cell =
+                ReceiveCustomMsgCell(message: (message as ZIMCustomMessage));
+            historyMessageWidgetList.add(cell);
+            break;
           default:
         }
       }
@@ -208,12 +216,20 @@ class PeerChatPageController extends GetxController {
     historyMessageWidgetList.add(cell);
 
     try {
+      ZIMPushConfig pushConfig = ZIMPushConfig();
+      pushConfig.title = "Offline notification title";
+      pushConfig.content = "Offline notification content";
+      sendConfig.pushConfig = pushConfig;
+      ZIMMessageSendNotification notification =
+          ZIMMessageSendNotification(onMessageAttached: (message) {
+        log('onMessageAttached');
+      });
       ZIMMessageSentResult result = await ZIM.getInstance()!.sendMessage(
           textMessage,
           conversationID,
           ZIMConversationType.peer,
           sendConfig,
-          ZIMMessageSendNotification(onMessageAttached: ((message) async {})));
+          notification);
 
       int index = historyZIMMessageList
           .lastIndexWhere((element) => element == textMessage);
@@ -221,6 +237,54 @@ class PeerChatPageController extends GetxController {
       SendTextMsgCell cell =
           SendTextMsgCell(message: (result.message as ZIMTextMessage));
 
+      historyMessageWidgetList[index] = cell;
+      update();
+    } on PlatformException catch (onError) {
+      log('send error,code:' + onError.code + 'message:' + onError.message!);
+      int index = historyZIMMessageList
+          .lastIndexWhere((element) => element == textMessage);
+      historyZIMMessageList[index].sentStatus = ZIMMessageSentStatus.failed;
+      SendTextMsgCell cell = SendTextMsgCell(
+          message: (historyZIMMessageList[index] as ZIMTextMessage));
+      historyMessageWidgetList[index] = cell;
+      update();
+    }
+  }
+
+  sendCustomMessage() async {
+    ZIMCustomMessage textMessage =
+        ZIMCustomMessage(message: "message", subType: 1);
+    textMessage.senderUserID = userModel.id!;
+    ZIMMessageSendConfig sendConfig = ZIMMessageSendConfig();
+    historyZIMMessageList.add(textMessage);
+    SendCustomMsgCell cell = SendCustomMsgCell(message: textMessage);
+    historyMessageWidgetList.add(cell);
+
+    try {
+      ZIMPushConfig pushConfig = ZIMPushConfig();
+      pushConfig.title = "Offline notification title";
+      pushConfig.content = "Offline notification content";
+      sendConfig.pushConfig = pushConfig;
+      ZIMMessageSendNotification notification =
+          ZIMMessageSendNotification(onMessageAttached: (message) {
+        log('onMessageAttached');
+      });
+      ZIMMessageSentResult result = await ZIM.getInstance()!.sendMessage(
+          textMessage,
+          conversationID,
+          ZIMConversationType.peer,
+          sendConfig,
+          notification);
+
+      int index = historyZIMMessageList
+          .lastIndexWhere((element) => element == textMessage);
+      historyZIMMessageList[index] = result.message;
+      SendCustomMsgCell cell =
+          SendCustomMsgCell(message: (result.message as ZIMCustomMessage));
+      print(conversationID);
+      Get.toNamed(Routes.VIDEO_CONFERENCE, arguments: {
+        ArgumentConstant.conversationID: result.message.messageID.toString(),
+      });
       historyMessageWidgetList[index] = cell;
       update();
     } on PlatformException catch (onError) {
