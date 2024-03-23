@@ -35,6 +35,7 @@ class PeerChatPageController extends GetxController with StateMixin {
   HomeController homeController = Get.find<HomeController>();
   ScrollController scrollController = ScrollController();
   bool isInvokeQueryMethod = false;
+  RxBool hasData = false.obs;
   @override
   void onInit() {
     if (Get.arguments != null) {
@@ -166,9 +167,18 @@ class PeerChatPageController extends GetxController with StateMixin {
       //window.console.warn(infos);
     };
 
-    ZIMEventHandler.onMessageDeleted = (zim, deletedInfo) {};
+    ZIMEventHandler.onMessageDeleted = (zim, deletedInfo) {
+      print("Message Deleted");
+    };
 
     ZIMEventHandler.onUserInfoUpdated = (zim, info) {};
+
+    ZIMEventHandler.onMessageRevokeReceived = (zim, messageList) {
+      print("Message Revoked");
+
+      historyZIMMessageList.removeWhere((e) =>
+          messageList.any((element) => element.messageID == e.messageID));
+    };
   }
 
   queryMoreHistoryMessageWidgetList() async {
@@ -369,9 +379,9 @@ class PeerChatPageController extends GetxController with StateMixin {
     update();
   }
 
-  void deleteSelectedMessage() {
+  void deleteFromMe() {
     ZIMMessageDeleteConfig config = ZIMMessageDeleteConfig();
-    config.isAlsoDeleteServerMessage = false;
+    config.isAlsoDeleteServerMessage = true;
     ZIM
         .getInstance()!
         .deleteMessages(
@@ -387,5 +397,26 @@ class PeerChatPageController extends GetxController with StateMixin {
       selectedList.clear();
       update();
     });
+  }
+
+  void deleteFromEveryone() {
+    ZIMMessageRevokeConfig revokeConfig = ZIMMessageRevokeConfig();
+    revokeConfig.revokeExtendedData = '';
+    ZIMPushConfig pushConfig = ZIMPushConfig();
+    pushConfig.title = '${userModel.name} recall a message';
+    pushConfig.content = 'A message is recalled.';
+    selectedList.forEach((element) {
+      ZIM.getInstance()!.revokeMessage(element, revokeConfig).then((result) {
+        historyZIMMessageList.remove(element);
+      }).catchError((onError) {
+        print("Message recalling failed");
+        // Message recalling failed
+      });
+    });
+    historyZIMMessageList.refresh();
+    selectedList.clear();
+    selectedList.refresh();
+    hasData.value = true;
+    update();
   }
 }

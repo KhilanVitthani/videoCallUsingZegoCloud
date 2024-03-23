@@ -18,194 +18,236 @@ class PeerChatPageView extends GetView<PeerChatPageController> {
       assignId: true,
       init: PeerChatPageController(),
       builder: (controller) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              controller.conversationName,
-              style: const TextStyle(color: Colors.black),
+        return Obx(() {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                controller.conversationName,
+                style: const TextStyle(color: Colors.black),
+              ),
+              backgroundColor: Colors.white70,
+              shadowColor: Colors.white,
+              leading: Builder(
+                builder: (context) {
+                  return IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.arrow_back),
+                    color: Colors.black,
+                  );
+                },
+              ),
+              actions: [
+                if (controller.selectedList.isEmpty)
+                  IconButton(
+                    onPressed: () {
+                      controller.sendCustomMessage();
+                    },
+                    icon: const Icon(Icons.dashboard_customize),
+                    color: Colors.black,
+                  )
+                else
+                  IconButton(
+                    onPressed: () {
+                      // controller.deleteSelectedMessage();
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Delete Message'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (controller.selectedList.every((element) =>
+                                    element.senderUserID ==
+                                    controller.userModel.id))
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      controller.deleteFromEveryone();
+                                      Get.back();
+                                    },
+                                    child: Text('Delete From Everyone'),
+                                  ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    controller.deleteFromMe();
+                                    Get.back();
+                                  },
+                                  child: Text('Delete From me'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    controller.selectedList.clear();
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Cencel'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.delete),
+                    color: Colors.black,
+                  ),
+              ],
             ),
-            backgroundColor: Colors.white70,
-            shadowColor: Colors.white,
-            leading: Builder(
-              builder: (context) {
-                return IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.arrow_back),
-                  color: Colors.black,
-                );
-              },
-            ),
-            actions: [
-              if (controller.selectedList.isEmpty)
-                IconButton(
-                  onPressed: () {
-                    controller.sendCustomMessage();
-                  },
-                  icon: const Icon(Icons.dashboard_customize),
-                  color: Colors.black,
-                )
-              else
-                IconButton(
-                  onPressed: () {
-                    controller.deleteSelectedMessage();
-                  },
-                  icon: const Icon(Icons.delete),
-                  color: Colors.black,
-                ),
-            ],
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: (() {
-                    MsgBottomModel.nonselfOnTapResponse();
-                    controller.update();
-                  }),
-                  child: Scrollbar(
-                    controller: controller.scrollController,
-                    child: NotificationListener(
-                      onNotification: (ScrollNotification notification) {
-                        double progressMedian = notification.metrics.pixels /
-                            notification.metrics.maxScrollExtent;
-                        int progress = (progressMedian * 100).toInt();
+            body: Column(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: (() {
+                      MsgBottomModel.nonselfOnTapResponse();
+                      controller.update();
+                    }),
+                    child: Scrollbar(
+                      controller: controller.scrollController,
+                      child: NotificationListener(
+                        onNotification: (ScrollNotification notification) {
+                          double progressMedian = notification.metrics.pixels /
+                              notification.metrics.maxScrollExtent;
+                          int progress = (progressMedian * 100).toInt();
 
-                        if (progress >= 90) {
-                          controller.queryMoreHistoryMessageWidgetList();
-                          // isInvokeQueryMethod = true;
-                        }
-                        return false;
-                      },
-                      child: SingleChildScrollView(
-                        controller: controller.scrollController,
-                        reverse: true,
-                        child: Column(
-                          children: List.generate(
-                            controller.historyZIMMessageList.length,
-                            (index) {
-                              ZIMMessage message =
-                                  controller.historyZIMMessageList[index];
-                              bool isSelf = message.senderUserID ==
-                                  controller.userModel.id;
-                              return InkWell(
-                                onTap: () {
-                                  if(controller.selectedList.isNotEmpty){
+                          if (progress >= 90) {
+                            controller.queryMoreHistoryMessageWidgetList();
+                            // isInvokeQueryMethod = true;
+                          }
+                          return false;
+                        },
+                        child: SingleChildScrollView(
+                          controller: controller.scrollController,
+                          reverse: true,
+                          child: Column(
+                            children: List.generate(
+                              controller.historyZIMMessageList.length,
+                              (index) {
+                                ZIMMessage message =
+                                    controller.historyZIMMessageList[index];
+                                bool isSelf = message.senderUserID ==
+                                    controller.userModel.id;
+                                return InkWell(
+                                  onTap: () {
+                                    if (controller.selectedList.isNotEmpty) {
+                                      controller.onLongPress(message: message);
+                                    }
+                                  },
+                                  onLongPress: () {
                                     controller.onLongPress(message: message);
-                                  }
-                                },
-                                onLongPress: () {
-                                  controller.onLongPress(message: message);
-                                },
-                                child: Container(
-                                  color:
-                                      controller.selectedList.contains(message)
-                                          ? Colors.grey[300]
-                                          : Colors.transparent,
-                                  child: Column(
-                                    children: [
-                                      if (message is ZIMTextMessage)
-                                        Align(
-                                          alignment: (isSelf)
-                                              ? Alignment.centerRight
-                                              : Alignment.centerLeft,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 5,
-                                            ),
-                                            margin: const EdgeInsets.symmetric(
-                                              vertical: 5,
-                                              horizontal: 10,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: (isSelf)
-                                                  ? Colors.blue[100]
-                                                  : Colors.grey[300],
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment: (isSelf)
-                                                  ? CrossAxisAlignment.end
-                                                  : CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  message.message,
-                                                ),
-                                                Text(
-                                                  DateTime.fromMillisecondsSinceEpoch(
-                                                          message.timestamp)
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 12,
+                                  },
+                                  child: Container(
+                                    color: controller.selectedList
+                                            .contains(message)
+                                        ? Colors.grey[300]
+                                        : Colors.transparent,
+                                    child: Column(
+                                      children: [
+                                        if (message is ZIMTextMessage)
+                                          Align(
+                                            alignment: (isSelf)
+                                                ? Alignment.centerRight
+                                                : Alignment.centerLeft,
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                                vertical: 5,
+                                              ),
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 5,
+                                                horizontal: 10,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: (isSelf)
+                                                    ? Colors.blue[100]
+                                                    : Colors.grey[300],
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment: (isSelf)
+                                                    ? CrossAxisAlignment.end
+                                                    : CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    message.message,
                                                   ),
-                                                ),
-                                              ],
+                                                  Text(
+                                                    DateTime.fromMillisecondsSinceEpoch(
+                                                            message.timestamp)
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      if (message is ZIMCustomMessage)
-                                        Align(
-                                          alignment: (isSelf)
-                                              ? Alignment.centerRight
-                                              : Alignment.centerLeft,
-                                          child: ReceiveCustomMsgCell(
-                                              message: message),
-                                        ),
-                                      if (message is ZIMImageMessage)
-                                        Align(
-                                          alignment: (isSelf)
-                                              ? Alignment.centerRight
-                                              : Alignment.centerLeft,
-                                          child: ReceiveImageMsgCell(
-                                              message: message,
-                                              downloadingProgress: null,
-                                              downloadingProgressModel: null),
-                                        ),
-                                      if (message is ZIMVideoMessage)
-                                        Align(
-                                          alignment: (isSelf)
-                                              ? Alignment.centerRight
-                                              : Alignment.centerLeft,
-                                          child: ReceiveVideoMsgCell(
-                                              message: message,
-                                              downloadingProgressModel: null),
-                                        ),
-                                    ],
+                                        if (message is ZIMCustomMessage)
+                                          Align(
+                                            alignment: (isSelf)
+                                                ? Alignment.centerRight
+                                                : Alignment.centerLeft,
+                                            child: ReceiveCustomMsgCell(
+                                                message: message),
+                                          ),
+                                        if (message is ZIMImageMessage)
+                                          Align(
+                                            alignment: (isSelf)
+                                                ? Alignment.centerRight
+                                                : Alignment.centerLeft,
+                                            child: ReceiveImageMsgCell(
+                                                message: message,
+                                                downloadingProgress: null,
+                                                downloadingProgressModel: null),
+                                          ),
+                                        if (message is ZIMVideoMessage)
+                                          Align(
+                                            alignment: (isSelf)
+                                                ? Alignment.centerRight
+                                                : Alignment.centerLeft,
+                                            child: ReceiveVideoMsgCell(
+                                                message: message,
+                                                downloadingProgressModel: null),
+                                          ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
+                            //children: [],
                           ),
-                          //children: [],
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              MsgNormalBottomBox(
-                sendTextFieldonSubmitted: (message) {
-                  controller.sendTextMessage(message);
-                },
-                onCameraIconButtonOnPressed: (path) {
-                  controller.sendMediaMessage(path, ZIMMessageType.image);
-                },
-                onImageIconButtonOnPressed: (path) {
-                  controller.sendMediaMessage(path, ZIMMessageType.image);
-                },
-                onVideoIconButtonOnPressed: (path) {
-                  controller.sendMediaMessage(path, ZIMMessageType.video);
-                },
-              ),
-            ],
-          ),
-          backgroundColor: Colors.grey[100],
-          resizeToAvoidBottomInset: true,
-        );
+                MsgNormalBottomBox(
+                  sendTextFieldonSubmitted: (message) {
+                    controller.sendTextMessage(message);
+                  },
+                  onCameraIconButtonOnPressed: (path) {
+                    controller.sendMediaMessage(path, ZIMMessageType.image);
+                  },
+                  onImageIconButtonOnPressed: (path) {
+                    controller.sendMediaMessage(path, ZIMMessageType.image);
+                  },
+                  onVideoIconButtonOnPressed: (path) {
+                    controller.sendMediaMessage(path, ZIMMessageType.video);
+                  },
+                ),
+              ],
+            ),
+            backgroundColor: Colors.grey[100],
+            resizeToAvoidBottomInset: true,
+          );
+        });
       },
     );
   }
