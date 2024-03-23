@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:video_call/app/modules/home/controllers/home_controller.dart';
@@ -21,17 +21,20 @@ import '../views/msg_items/receive_items/recive_custome_msg_cell.dart';
 import '../views/msg_items/send_items/send_text_msg_cell.dart';
 import '../views/msg_items/uploading_progress_model.dart';
 
-class PeerChatPageController extends GetxController {
+class PeerChatPageController extends GetxController with StateMixin {
   String conversationID = '';
   String conversationName = '';
   double sendTextFieldBottomMargin = 40;
   bool emojiShowing = false;
   RxList<ZIMMessage> historyZIMMessageList = <ZIMMessage>[].obs;
   RxList<Widget> historyMessageWidgetList = <Widget>[].obs;
+  RxList<ZIMMessage> selectedList = <ZIMMessage>[].obs;
   double progress = 0.0;
   bool queryHistoryMsgComplete = false;
   UserModel userModel = UserModel();
   HomeController homeController = Get.find<HomeController>();
+  ScrollController scrollController = ScrollController();
+  bool isInvokeQueryMethod = false;
   @override
   void onInit() {
     if (Get.arguments != null) {
@@ -96,7 +99,8 @@ class PeerChatPageController extends GetxController {
           case ZIMMessageType.text:
             ReceiveTextMsgCell cell =
                 ReceiveTextMsgCell(message: (message as ZIMTextMessage));
-            historyMessageWidgetList.add(cell);
+            historyMessageWidgetList
+                .add(chatWidget(child: cell, message: message));
             break;
           case ZIMMessageType.image:
             if ((message as ZIMImageMessage).fileLocalPath == "") {
@@ -154,6 +158,7 @@ class PeerChatPageController extends GetxController {
           default:
         }
       }
+
       update();
     };
 
@@ -187,8 +192,9 @@ class PeerChatPageController extends GetxController {
       if (result.messageList.length < 20) {
         queryHistoryMsgComplete = true;
       }
-      List<Widget> oldMessageWidgetList =
-          MsgConverter.cnvMessageToWidget(result.messageList);
+      List<Widget> oldMessageWidgetList = MsgConverter().cnvMessageToWidget(
+        result.messageList,
+      );
       result.messageList.addAll(historyZIMMessageList);
       historyZIMMessageList.value = result.messageList;
 
@@ -343,5 +349,43 @@ class PeerChatPageController extends GetxController {
       historyMessageWidgetList[index] = failedCell;
       update();
     }
+  }
+
+  Widget chatWidget({required Widget child, required ZIMMessage message}) {
+    return InkWell(
+      onTap: () {},
+      child: child,
+    );
+  }
+
+  void onLongPress({required ZIMMessage message}) {
+    if (selectedList.contains(message)) {
+      selectedList.remove(message);
+    } else {
+      selectedList.add(message);
+    }
+    print(selectedList.length);
+    selectedList.refresh();
+    update();
+  }
+
+  void deleteSelectedMessage() {
+    ZIMMessageDeleteConfig config = ZIMMessageDeleteConfig();
+    config.isAlsoDeleteServerMessage = false;
+    ZIM
+        .getInstance()!
+        .deleteMessages(
+            selectedList, conversationID, ZIMConversationType.peer, config)
+        .then((value) {
+      historyZIMMessageList
+          .removeWhere((element) => selectedList.contains(element));
+      // oldMessageWidgetList.addAll(historyMessageWidgetList);
+      List<Widget> oldMessageWidgetList = MsgConverter().cnvMessageToWidget(
+        historyZIMMessageList,
+      );
+      historyMessageWidgetList.value = oldMessageWidgetList;
+      selectedList.clear();
+      update();
+    });
   }
 }

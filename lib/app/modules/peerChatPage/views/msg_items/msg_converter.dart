@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:video_call/app/modules/peerChatPage/controllers/peer_chat_page_controller.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/receive_items/receive_image_msg_cell.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/receive_items/receive_text_msg_cell.dart';
 import 'package:video_call/app/modules/peerChatPage/views/msg_items/receive_items/receive_video_msg_cell.dart';
@@ -12,7 +14,8 @@ import 'package:video_call/app/modules/peerChatPage/views/msg_items/uploading_pr
 import 'package:zego_zim/zego_zim.dart';
 
 class MsgConverter {
-  static List<Widget> cnvMessageToWidget(List<ZIMMessage> messageList) {
+  final PeerChatPageController controller = Get.find();
+  List<Widget> cnvMessageToWidget(List<ZIMMessage> messageList) {
     List<Widget> widgetList = [];
 
     for (ZIMMessage message in messageList) {
@@ -21,7 +24,8 @@ class MsgConverter {
       switch (message.type) {
         case (ZIMMessageType.text):
           if (message.senderUserID == userID) {
-            cell = SendTextMsgCell(message: (message as ZIMTextMessage));
+            cell = Container(
+                child: SendTextMsgCell(message: (message as ZIMTextMessage)));
           } else {
             cell = ReceiveTextMsgCell(message: (message as ZIMTextMessage));
           }
@@ -72,7 +76,14 @@ class MsgConverter {
           break;
         default:
       }
-      widgetList.add(cell);
+      widgetList.add(
+        InkWell(
+          onLongPress: () {
+            controller.onLongPress(message: message);
+          },
+          child: cell,
+        ),
+      );
     }
     return widgetList;
   }

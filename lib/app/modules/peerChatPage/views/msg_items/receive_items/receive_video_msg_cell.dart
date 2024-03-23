@@ -64,28 +64,19 @@ class ReceiveVideoeMsgCellState extends State<ReceiveVideoMsgCell> {
         horizontal: 10,
         vertical: 5,
       ),
-      width: double.infinity,
-      child: Row(
+      // width: double.infinity,
+      child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [getVideoBubble()],
-              ),
-              Text(
-                  DateTime.fromMillisecondsSinceEpoch(widget.message.timestamp)
-                      .toString(),
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  )),
-            ],
-          ),
+          getVideoBubble(),
+          Text(
+              DateTime.fromMillisecondsSinceEpoch(widget.message.timestamp)
+                  .toString(),
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+              )),
         ],
       ),
     );

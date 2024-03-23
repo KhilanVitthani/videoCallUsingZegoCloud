@@ -64,30 +64,19 @@ class ReceiveImageMsgCellState extends State<ReceiveImageMsgCell> {
         horizontal: 10,
         vertical: 5,
       ),
-      width: double.infinity,
-      child: Row(
+      // width: double.infinity,
+      child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ImageBubble(filelocalPath: widget.message.fileLocalPath)
-                ],
-              ),
-              Text(
-                  DateTime.fromMillisecondsSinceEpoch(widget.message.timestamp)
-                      .toString(),
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  )),
-            ],
-          ),
+          ImageBubble(filelocalPath: widget.message.fileLocalPath),
+          Text(
+              DateTime.fromMillisecondsSinceEpoch(widget.message.timestamp)
+                  .toString(),
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+              )),
         ],
       ),
     );
